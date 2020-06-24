@@ -49,6 +49,26 @@ class Window():
         y = int((i + (1-sf)/2) * cell_width)
         self.display.blit(resized_rook, (x, y))
 
+    def draw_druid(self, i, j, colour):
+        filename = "druid_RED.png" if colour == RED else "druid_BLUE.png"
+        druid_image = pygame.image.load("images/" + filename)
+        cell_width = self.side_length/self.n
+        sf = 0.7
+        resized_druid = pygame.transform.scale(druid_image, (int(cell_width*sf), int(cell_width*sf)))
+        x = int((j + (1-sf)/2) * cell_width) 
+        y = int((i + (1-sf)/2) * cell_width)
+        self.display.blit(resized_druid, (x, y))
+
+    def draw_ram(self, i, j, colour):
+        filename = "ram_RED.png" if colour == RED else "ram_BLUE.png"
+        ram_image = pygame.image.load("images/" + filename)
+        cell_width = self.side_length/self.n
+        sf = 0.85
+        resized_ram = pygame.transform.scale(ram_image, (int(cell_width*sf), int(cell_width*sf)))
+        x = int((j + (1-sf)/2) * cell_width) 
+        y = int((i + (1-sf)/2) * cell_width)
+        self.display.blit(resized_ram, (x, y))
+
     def draw_bishop(self, i, j, colour):
         filename = "bishop_RED.jpg" if colour == RED else "bishop_BLUE.jpg"
         bishop_image = pygame.image.load("images/" + filename)
@@ -58,6 +78,16 @@ class Window():
         x = int((j + (1-sf)/2) * cell_width) 
         y = int((i + (1-sf)/2) * cell_width)
         self.display.blit(resized_bishop, (x, y))
+
+    def draw_crystal(self, i, j, colour):
+        filename = "crystal_RED.png" if colour == RED else "crystal_BLUE.png"
+        crystal_image = pygame.image.load("images/" + filename)
+        cell_width = self.side_length/self.n
+        sf = 0.7
+        resized_crystal = pygame.transform.scale(crystal_image, (int(cell_width*sf), int(cell_width*sf)))
+        x = int((j + (1-sf)/2) * cell_width) 
+        y = int((i + (1-sf)/2) * cell_width)
+        self.display.blit(resized_crystal, (x, y))
 
     def draw_nexus(self, i, j, colour):
         filename = "nexus_RED.png" if colour == RED else "nexus_BLUE.png"
@@ -99,14 +129,19 @@ class Window():
                 else:
                     colour = BLUE
                 if abs(board.field[i][j]) == 1:
-                    self.draw_naught(i, j, colour)
+                    self.draw_crystal(i, j, colour)
                 elif abs(board.field[i][j]) == 2:
-                    self.draw_bishop(i, j, colour)
+                    self.draw_druid(i, j, colour)
                 elif abs(board.field[i][j]) == 3:
-                    self.draw_rook(i, j, colour)
+                    self.draw_ram(i, j, colour)
                 elif abs(board.field[i][j]) == 9:
                     self.draw_nexus(i, j, colour)
 
+    def coords_to_square(self, coords):
+        cell_width = self.side_length/self.n
+        i = coords[1] // cell_width
+        j = coords[0] // cell_width
+        return [i, j] 
 
 class Board():
 
@@ -250,6 +285,9 @@ class Nexus():
         else:
             return 0
 
+    def get_user_move(self, field, turn):
+        legal_moves = self.get_legal_moves(field)
+
     def handle_turn(self):
         control_matrix = self.get_control_matrix(self.board.field)
         for i in range(len(self.board.field)):
@@ -265,14 +303,22 @@ class Nexus():
                 print("pass")
             else:
                 # move = self.agent.get_random_move(self.board.field, self.turn)
-                move = self.agent.get_MCTS_move(self.board.field, self.turn)
+                if self.turn == 1:
+                    move = self.agent.get_MCTS_move(self.board.field, self.turn)
+                else:
+                    move_input = input("move: ").split(" ")
+                    move = [int(x) for x in move_input]
                 self.insert_token(move)
             self.turn = self.turn * -1
             self.window.draw_board(self.board)
             # self.window.clock.tick(60)
             pygame.display.flip()
             pygame.time.delay(300)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
             self.handle_turn()
+
 
 class Game_Node():
     
