@@ -139,8 +139,8 @@ class Window():
 
     def coords_to_square(self, coords):
         cell_width = self.side_length/self.n
-        i = coords[1] // cell_width
-        j = coords[0] // cell_width
+        i = int(coords[1] // cell_width)
+        j = int(coords[0] // cell_width)
         return [i, j] 
 
 class Board():
@@ -153,15 +153,18 @@ class Board():
             [0, 0, 0, 0, 0],
             [0, 9, 0, 0, 0],
         ]
+        self.field = [[0 for j in range(width)] for i in range(height)]
+        self.field[0][width-2] = -9
+        self.field[height-1][1] = 9
 
 class Nexus():
 
-    def __init__(self):
+    def __init__(self, width, height):
         self.running = True
         self.turn = 1
-        self.board = Board(5, 5)
-        self.agent = Agent()
-        self.window = Window(5)
+        self.board = Board(width , height)
+        self.agent = Agent(width, height)
+        self.window = Window(width)
 
     def on_board(self, i, j):
         height = len(self.board.field)
@@ -238,7 +241,7 @@ class Nexus():
         n = len(field)
         if i in range(0, n) and j in range(0, n):
             if field[i][j] == 0:
-                new_field[i][j] = token
+                new_field[i][j] = min(token, 3)
             else:
                 raise ValueError("Square Already Occupied")
         else:
@@ -286,7 +289,14 @@ class Nexus():
             return 0
 
     def get_user_move(self, field, turn):
-        legal_moves = self.get_legal_moves(field)
+        legal_moves = self.get_legal_moves(field, turn)
+        while True:
+            event = pygame.event.wait()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                coords = event.pos
+                move = self.window.coords_to_square(coords)
+                if move in legal_moves:
+                    return move
 
     def handle_turn(self):
         control_matrix = self.get_control_matrix(self.board.field)
@@ -304,16 +314,24 @@ class Nexus():
             else:
                 # move = self.agent.get_random_move(self.board.field, self.turn)
                 if self.turn == 1:
-                    move = self.agent.get_MCTS_move(self.board.field, self.turn)
+                    # move = self.agent.get_MCTS_move(self.board.field, self.turn)
+                    result = self.agent.negamax(Game_Node(None, self.board.field, self.turn), 1, -10000, 10000, 1)
+                    move = result.move
+                    print(result.value)
+                    # move = self.get_user_move(self.board.field, self.turn)
                 else:
-                    move_input = input("move: ").split(" ")
-                    move = [int(x) for x in move_input]
+                    # move_input = input("move: ").split(" ")
+                    # move = [int(x) for x in move_input]
+                    # move = self.get_user_move(self.board.field, self.turn)
+                    result = self.agent.negamax(Game_Node(None, self.board.field, self.turn), 3, -10000, 10000, -1)
+                    move = result.move
+                    print(result.value)
                 self.insert_token(move)
             self.turn = self.turn * -1
             self.window.draw_board(self.board)
             # self.window.clock.tick(60)
             pygame.display.flip()
-            pygame.time.delay(300)
+            # pygame.time.delay(1)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     quit()
@@ -322,13 +340,13 @@ class Nexus():
 
 class Game_Node():
     
-    def __init__(self, move, field, turn):
+    def __init__(self, move, field, turn, value = 0):
         self.move = move
         self.field = field
         self.turn = turn
         self.children = []
         self.visits = 0
-        self.value = 0
+        self.value = value
 
     def __eq__(self, x):
         return self.move == x.move and self.field == x.field
@@ -336,13 +354,16 @@ class Game_Node():
     def __repr__(self):
         move = str(self.move)
         return move + " value: " + str(self.value/self.visits)
+
+    def __gt__(self, x):
+        return self.value > x.value
     
 class Agent(Nexus):
 
-    def __init__(self):
+    def __init__(self, width, height):
         self.running = True
         self.turn = 1
-        self.board = Board(5, 5)
+        self.board = Board(width, height)
 
     def get_random_move(self, field, turn):
         legals = self.get_legal_moves(field, turn)
@@ -455,9 +476,38 @@ class Agent(Nexus):
                 best_node = child
         print()
         return best_node.move
+    
+    def evaluate(self, node):
+        if self.game_ended(node.field):
+            winner = self.find_winner(node.field)
+            return winner * 10000
+        pos_moves = self.get_legal_moves(node.field, 1)
+        neg_moves = self.get_legal_moves(node.field, -1)
+        mobility = len(pos_moves) - len(neg_moves)
+        neg_nexus, pos_nexus = self.get_nexus_coords(node.field)
+        neg_nexus_control = self.get_cell_control(node.field, neg_nexus)
+        pos_nexus_control = self.get_cell_control(node.field, pos_nexus)
+        nexus_difference = pos_nexus_control + neg_nexus_control
+        return nexus_difference*10 + mobility
+    
+    def negamax(self, node, depth, alpha, beta, colour):
+        if depth == 0 or self.game_ended(node.field):
+            return Game_Node(None, None, None, colour * self.evaluate(node))
+        value = Game_Node(None, None, None, -100000)
+        legals = self.get_legal_moves(node.field, node.turn)
+        for move in legals:
+            child_field = self.get_next_board(node.field, move, node.turn)
+            child_node = Game_Node(move, child_field, node.turn*-1)
+            child_node.value = -self.negamax(child_node, depth -1, -beta, -alpha, -colour).value
+            value = max(value, child_node)
+            alpha = max(value.value, alpha)
+            if alpha >= beta:
+                break
+        return value
+            
 
 
-nexus = Nexus()
+nexus = Nexus(9, 9)
 nexus.window.setup_display()
 nexus.window.draw_board(nexus.board)
 pygame.display.flip()
