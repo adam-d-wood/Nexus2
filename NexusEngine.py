@@ -39,13 +39,44 @@ class Window():
         cell_centre = [int(n) for n in [x + cell_width * 0.5, y + cell_width * 0.5]]
         pygame.draw.circle(self.display, colour, cell_centre, int(naught_size*0.5), 1)
 
-    def draw_nexus(self, i, j, colour):
+    def draw_rook(self, i, j, colour):
+        filename = "rook_RED.png" if colour == RED else "rook_BLUE.png"
+        rook_image = pygame.image.load("images/" + filename)
         cell_width = self.side_length/self.n
-        naught_size = 0.5 * cell_width
-        x = j * cell_width
-        y = i * cell_width
-        cell_centre = [int(n) for n in [x + cell_width * 0.5, y + cell_width * 0.5]]
-        pygame.draw.circle(self.display, colour, cell_centre, int(naught_size*0.5), 0)
+        sf = 0.7
+        resized_rook = pygame.transform.scale(rook_image, (int(cell_width*sf), int(cell_width*sf)))
+        x = int((j + (1-sf)/2) * cell_width) 
+        y = int((i + (1-sf)/2) * cell_width)
+        self.display.blit(resized_rook, (x, y))
+
+    def draw_bishop(self, i, j, colour):
+        filename = "bishop_RED.jpg" if colour == RED else "bishop_BLUE.jpg"
+        bishop_image = pygame.image.load("images/" + filename)
+        cell_width = self.side_length/self.n
+        sf = 0.7
+        resized_bishop = pygame.transform.scale(bishop_image, (int(cell_width*sf), int(cell_width*sf)))
+        x = int((j + (1-sf)/2) * cell_width) 
+        y = int((i + (1-sf)/2) * cell_width)
+        self.display.blit(resized_bishop, (x, y))
+
+    def draw_nexus(self, i, j, colour):
+        filename = "nexus_RED.png" if colour == RED else "nexus_BLUE.png"
+        nexus_image = pygame.image.load("images/" + filename)
+        cell_width = self.side_length/self.n
+        sf = 0.7
+        resized_nexus = pygame.transform.scale(nexus_image, (int(cell_width*sf), int(cell_width*sf)))
+        x = int((j + (1-sf)/2) * cell_width) 
+        y = int((i + (1-sf)/2) * cell_width)
+        self.display.blit(resized_nexus, (x, y))
+
+
+    # def draw_nexus(self, i, j, colour):
+    #     cell_width = self.side_length/self.n
+    #     naught_size = 0.5 * cell_width
+    #     x = j * cell_width
+    #     y = i * cell_width
+    #     cell_centre = [int(n) for n in [x + cell_width * 0.5, y + cell_width * 0.5]]
+    #     pygame.draw.circle(self.display, colour, cell_centre, int(naught_size*0.5), 0)
 
 
     def draw_board(self, board):
@@ -70,7 +101,9 @@ class Window():
                 if abs(board.field[i][j]) == 1:
                     self.draw_naught(i, j, colour)
                 elif abs(board.field[i][j]) == 2:
-                    self.draw_cross(i, j, colour)
+                    self.draw_bishop(i, j, colour)
+                elif abs(board.field[i][j]) == 3:
+                    self.draw_rook(i, j, colour)
                 elif abs(board.field[i][j]) == 9:
                     self.draw_nexus(i, j, colour)
 
@@ -79,11 +112,11 @@ class Board():
 
     def __init__(self, width, height):
         self.field = [
+            [0, 0, 0, -9, 0],
             [0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
-            [0, 0, -9, 9, 0],
             [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
+            [0, 9, 0, 0, 0],
         ]
 
 class Nexus():
@@ -112,8 +145,17 @@ class Nexus():
         return squares
     
     def gen_rook_pattern(self, i, j):
-        
-    
+        squares = []
+        n = max(len(self.board.field), len(self.board.field[0]))
+        for k in range(-n, n):
+            square1 = [i+k, j]
+            square2 = [i, j+k]
+            for square in [square1, square2]:
+                if self.on_board(square[0], square[1]) and square not in squares:
+                    if square != [i, j]:
+                        squares.append(square)
+        return squares
+
     def gen_diagonal(self, i, j):
         # print("diagonal on", i, j)
         squares = []
@@ -139,10 +181,14 @@ class Nexus():
                     affected_cells = self.gen_d_pattern(i, j)
                     for cell in affected_cells:
                         control_matrix[cell[0]][cell[1]] += int(token/abs(token))
-                if abs(token) == 2:
+                elif abs(token) == 2:
                     affected_cells = self.gen_diagonal(i, j)
                     for cell in affected_cells:
-                        control_matrix[cell[0]][cell[1]] += 2*int(token/abs(token))
+                        control_matrix[cell[0]][cell[1]] += int(token/abs(token))
+                elif abs(token) == 3:
+                    affected_cells = self.gen_rook_pattern(i, j)
+                    for cell in affected_cells:
+                        control_matrix[cell[0]][cell[1]] += int(token/abs(token))
         return control_matrix
 
     def get_cell_control(self, field, cell):
@@ -191,15 +237,15 @@ class Nexus():
         neg_nexus_control = self.get_cell_control(field, neg_nexus)
         pos_nexus_control = self.get_cell_control(field, pos_nexus)
         legal_moves = self.get_legal_moves(field, 1) + self.get_legal_moves(field, -1)
-        return (neg_nexus_control  >= 2 or pos_nexus_control <= -2 or len(legal_moves) == 0)
+        return (neg_nexus_control  >= 1 or pos_nexus_control <= -1 or len(legal_moves) == 0)
     
     def find_winner(self, field):
         neg_nexus, pos_nexus = self.get_nexus_coords(field)
         neg_nexus_control = self.get_cell_control(field, neg_nexus)
         pos_nexus_control = self.get_cell_control(field, pos_nexus)
-        if neg_nexus_control >= 2:
+        if neg_nexus_control >= 1:
             return 1
-        elif pos_nexus_control <= -2:
+        elif pos_nexus_control <= -1:
             return -1
         else:
             return 0
@@ -344,7 +390,7 @@ class Agent(Nexus):
 
     def get_MCTS_move(self, field, turn):
         tree = Game_Node(None, field, turn)
-        for i in range(60):
+        for i in range(10):
             result, tree = self.MCTS(tree, turn)
         print(result)
         best_node = None
