@@ -146,16 +146,23 @@ class Window():
 class Board():
 
     def __init__(self, width, height):
-        self.field = [
-            [0, 0, 0, -9, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 9, 0, 0, 0],
-        ]
+        # self.field = [
+        #     [0, 0, 0, -9, 0],
+        #     [0, 0, 0, 0, 0],
+        #     [0, 0, 0, 0, 0],
+        #     [0, 0, 0, 0, 0],
+        #     [0, 9, 0, 0, 0],
+        # ]
         self.field = [[0 for j in range(width)] for i in range(height)]
         self.field[0][width-2] = -9
         self.field[height-1][1] = 9
+        # self.field[0][width-3] = -1
+        # self.field = [
+        #     [0, -2, -1, -9, 0],
+        #     [1, 0, -2, -1, 0],
+        #     [0, 0, 0, -2, 0],
+        #     [0, 1, 2, 0, 0],
+        #     [0, 9, 1, 2, 0]]
 
 class Nexus():
 
@@ -165,6 +172,7 @@ class Nexus():
         self.board = Board(width , height)
         self.agent = Agent(width, height)
         self.window = Window(width)
+        self.control_thresholds = [1, 2, 4]
 
     def on_board(self, i, j):
         height = len(self.board.field)
@@ -207,7 +215,22 @@ class Nexus():
                         squares.append(square)
         # print(squares)
         return squares
-        
+
+    def eliminate_pieces(self, field):
+        elimination = False
+        new_field = copy.deepcopy(field)
+        control_matrix = self.get_control_matrix(field)
+        for i in range(len(field)):
+            for j in range(len(field)):
+                token = field[i][j]
+                if token not in [0, 9, -9]:
+                    control = control_matrix[i][j]
+                    control_needed = self.token_to_control(token)
+                    if abs(control) < abs(control_needed):
+                        new_field[i][j] = 0
+                        elimination = True
+        return new_field, elimination
+
     def get_control_matrix(self, field):
         height = len(field)
         width = len(field[0])
@@ -233,23 +256,40 @@ class Nexus():
         control_matrix = self.get_control_matrix(field)
         return control_matrix[cell[0]][cell[1]]
 
+    def control_to_token(self, control):
+        threshold_reached = None
+        for t in self.control_thresholds:
+            if abs(control) >= t:
+                threshold_reached = t
+            else:
+                break
+        abs_token = self.control_thresholds.index(threshold_reached) + 1
+        token = abs_token if control > 0 else -abs_token
+        # print(token)
+        return token
+
+    def token_to_control(self, token):
+        abs_control = self.control_thresholds[abs(token)-1]
+        return abs_control if token > 0 else -abs_control
+
     def get_next_board(self, field, move, turn):
         control = self.get_cell_control(field, move)
-        token = int(abs(control) * turn)
+        token = self.control_to_token(control)
         i, j = move
         new_field = copy.deepcopy(field)
         n = len(field)
         if i in range(0, n) and j in range(0, n):
             if field[i][j] == 0:
-                new_field[i][j] = min(token, 3)
+                new_field[i][j] = token
             else:
                 raise ValueError("Square Already Occupied")
         else:
             raise ValueError("Invalid coordinates")
-        return new_field
+        post_elim_field, elimination = self.eliminate_pieces(new_field)
+        return post_elim_field, elimination
 
     def insert_token(self, move):
-        new_field = self.get_next_board(self.board.field, move, self.turn)
+        new_field, _ = self.get_next_board(self.board.field, move, self.turn)
         self.board.field = new_field
 
     def get_legal_moves(self, field, turn):
@@ -298,8 +338,40 @@ class Nexus():
                 if move in legal_moves:
                     return move
 
+    def insert_in_order(self, x, xs):
+        if len(xs) == 0:
+            return [x]
+        elif len(xs) == 1:
+            if x[1] > xs[0][1]:
+                return [x] + xs
+            else:
+                return xs + [x]
+        else:
+            half = len(xs)//2
+            if x[1] > xs[half][1]:
+                return self.insert_in_order(x, xs[:half]) + xs[half:]
+            else:
+                return xs[:half] + self.insert_in_order(x, xs[half:])
+
+    
+    def order_by_elims(self, field, turn, legals):
+        if len(legals) == 0:
+            return []
+        elims = []
+        non_elims = []
+        for move in legals:
+            _, elimination = self.get_next_board(field, move, turn)
+            if elimination:
+                elim_value = abs(field[move[0]][move[1]])
+                elims = self.insert_in_order([move, elim_value], elims)
+            else:
+                non_elims.append(move)
+        return [x[0] for x in elims] + non_elims
+
+
     def handle_turn(self):
         control_matrix = self.get_control_matrix(self.board.field)
+        print(self.turn)
         for i in range(len(self.board.field)):
             print_row = [str(self.board.field[i][j]).zfill(2) for j in range(len(self.board.field[i]))]
             control_print = [str(control_matrix[i][j]).zfill(2) for j in range(len(control_matrix[i]))]
@@ -315,17 +387,22 @@ class Nexus():
                 # move = self.agent.get_random_move(self.board.field, self.turn)
                 if self.turn == 1:
                     # move = self.agent.get_MCTS_move(self.board.field, self.turn)
-                    result = self.agent.negamax(Game_Node(None, self.board.field, self.turn), 1, -10000, 10000, 1)
+                    result = self.agent.negamax(Game_Node("hiya", self.board.field, self.turn), 12, -10000, 10000, 1)
                     move = result.move
-                    print(result.value)
+                    print()
+                    print(result.move, result.value)
+                    print()
                     # move = self.get_user_move(self.board.field, self.turn)
                 else:
                     # move_input = input("move: ").split(" ")
                     # move = [int(x) for x in move_input]
                     # move = self.get_user_move(self.board.field, self.turn)
-                    result = self.agent.negamax(Game_Node(None, self.board.field, self.turn), 3, -10000, 10000, -1)
+                    result = self.agent.negamax(Game_Node("bonjour", self.board.field, self.turn), 12, -10000, 10000, -1)
+                    # move = self.get_user_move(self.board.field, self.turn)
                     move = result.move
-                    print(result.value)
+                    print()
+                    print(result.move, result.value)
+                    print()
                 self.insert_token(move)
             self.turn = self.turn * -1
             self.window.draw_board(self.board)
@@ -353,7 +430,7 @@ class Game_Node():
     
     def __repr__(self):
         move = str(self.move)
-        return move + " value: " + str(self.value/self.visits)
+        return move + " value: " + str(self.value)
 
     def __gt__(self, x):
         return self.value > x.value
@@ -364,6 +441,7 @@ class Agent(Nexus):
         self.running = True
         self.turn = 1
         self.board = Board(width, height)
+        self.control_thresholds = [1, 2, 3]
 
     def get_random_move(self, field, turn):
         legals = self.get_legal_moves(field, turn)
@@ -396,7 +474,7 @@ class Agent(Nexus):
         while not self.game_ended(field):
             if self.get_legal_moves(field, turn):
                 move = self.get_random_move(field, turn)
-                field = self.get_next_board(field, move, turn)
+                field, _ = self.get_next_board(field, move, turn)
             turn = turn * -1
         winner = self.find_winner(field)
         if winner == 0:
@@ -450,7 +528,7 @@ class Agent(Nexus):
             legals = self.get_legal_moves(node.field, node.turn)
             children = []
             for move in legals:
-                child_field = self.get_next_board(node.field, move, node.turn)
+                child_field, _ = self.get_next_board(node.field, move, node.turn)
                 child_node = Game_Node(move, child_field, node.turn * -1)
                 children.append(child_node)
             return children
@@ -480,7 +558,7 @@ class Agent(Nexus):
     def evaluate(self, node):
         if self.game_ended(node.field):
             winner = self.find_winner(node.field)
-            return winner * 10000
+            return winner * 20000
         pos_moves = self.get_legal_moves(node.field, 1)
         neg_moves = self.get_legal_moves(node.field, -1)
         mobility = len(pos_moves) - len(neg_moves)
@@ -493,13 +571,23 @@ class Agent(Nexus):
     def negamax(self, node, depth, alpha, beta, colour):
         if depth == 0 or self.game_ended(node.field):
             return Game_Node(None, None, None, colour * self.evaluate(node))
-        value = Game_Node(None, None, None, -100000)
+        value = Game_Node("hello", None, None, -10000000)
         legals = self.get_legal_moves(node.field, node.turn)
-        for move in legals:
-            child_field = self.get_next_board(node.field, move, node.turn)
-            child_node = Game_Node(move, child_field, node.turn*-1)
+        # print("legals:", legals)
+        if len(legals) == 0:
+            child_node = Game_Node(None, node.field, node.turn * -1)
             child_node.value = -self.negamax(child_node, depth -1, -beta, -alpha, -colour).value
             value = max(value, child_node)
+            # print("value:", value)
+        ordered_legals = self.order_by_elims(node.field, node.turn, legals)
+        # print("ordered_legals", ordered_legals)
+        for move in ordered_legals:
+            child_field, _ = self.get_next_board(node.field, move, node.turn)
+            child_node = Game_Node(move, child_field, node.turn*-1)
+            child_node.value = -self.negamax(child_node, depth -1, -beta, -alpha, -colour).value
+            # print(move, child_node.value)
+            value = max(value, child_node)
+            # print("value:", value)
             alpha = max(value.value, alpha)
             if alpha >= beta:
                 break
@@ -507,7 +595,7 @@ class Agent(Nexus):
             
 
 
-nexus = Nexus(9, 9)
+nexus = Nexus(5, 5)
 nexus.window.setup_display()
 nexus.window.draw_board(nexus.board)
 pygame.display.flip()
