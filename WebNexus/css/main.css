@@ -1,0 +1,27 @@
+canvas {
+    background-color: white;
+    border-radius: 5px;
+}
+
+body {
+    background: grey;
+}
+
+.sprite {
+    display: none;
+}
+
+#optionsPanel {
+    height: 600px;
+    background-color: white;
+    border-radius: 5px;
+    padding: 30px;
+}
+
+.depthLabel {
+    display: block;
+}
+
+.dimSelect {
+    width:40px;
+}
