@@ -1,0 +1,69 @@
+canvas {
+    background-color: rgba(0, 0, 0, 0);
+    /* opacity: 0%; */
+    border-radius: 5px;
+    margin: auto;
+    display: block;
+}
+
+#header {
+    height: 100px;
+    /* width: 100%; */
+    /* background-color: darkviolet; */
+    padding: 20px;
+    text-align: center;
+    color: white;
+}
+
+body {
+    background: black;
+    font-family: 'Press Start 2P', cursive;
+    background: radial-gradient(ellipse at top, #e66465, transparent),
+            radial-gradient(ellipse at bottom, #4d9f0c, transparent);  /* background-image: url("../images/nebula.jpg"); */
+    height: 100%;
+}
+
+.sprite {
+    display: none;
+}
+
+#optionsPanel {
+    height: 600px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 5px;
+    padding: 30px;
+    text-align: center;
+}
+
+#optionsPanel input[type="number"] {
+    border: none;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0);
+    color: white;
+}
+
+.depthLabel {
+    display: block;
+}
+
+.dimSelect {
+    width:40px;
+}
+
+#moveHistory {
+    width: 100%;
+    text-align: center;
+}
+
+/* #moveHistory th, tr {
+    border-bottom: black solid 1px;
+} */
+
+#tableWrapper {
+    background-color: rgba(0, 0, 0, 0);
+    color: white;
+    height: 600px;
+    border-radius: 5px;
+    margin: auto;
+}

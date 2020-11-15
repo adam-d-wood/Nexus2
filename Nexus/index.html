@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+	<link rel="stylesheet"
+		href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+		crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+    <script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+	</script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <title>Nexus</title>
+</head>
+
+<body>
+    <img src="images/crystal_BLUE_8bit.png" id="crystalBlue" class="sprite">
+    <img src="images/crystal_RED_8bit.png" id="crystalRed" class="sprite">
+    <img src="images/druid_BLUE_8bit2.png" id="druidBlue" class="sprite">
+    <img src="images/druid_RED_8bit2.png" id="druidRed" class="sprite">
+    <img src="images/ram_BLUE_8bit.png" id="ramBlue" class="sprite">
+    <img src="images/ram_RED_8bit.png" id="ramRed" class="sprite">
+    <img src="images/nexus_BLUE_8bit2.png" id="nexusBlue" class="sprite">
+    <img src="images/nexus_RED_8bit2.png" id="nexusRed" class="sprite">
+    <img src="images/nymph_RED_8bit.png" id="nymphRed" class="sprite">
+    <img src="images/nymph_BLUE_8bit.png" id="nymphBlue" class="sprite">
+    <img src="images/dryad_RED_8bit.png" id="dryadRed" class="sprite">
+    <img src="images/dryad_BLUE_8bit.png" id="dryadBlue" class="sprite">
+
+
+    <div class="container-fluid" id="header">
+        <h1>Nexus</h1>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-3">
+                    <div class="container-fluid neon-outline" id="optionsPanel">
+                        <div class="container-fluid">
+                        <div class="form-group" id="dimSelectBox">
+                            <h5>Board Dimensions</h5>
+                            <input type="number" class="dimSelect" id="colsSelect" name="colsSelect" min="2" value="6">
+                            <span>x</span>
+                            <input type="number" class="dimSelect" id="rowsSelect" name="rowsSelect" min="2" value="6">
+                        </div>
+                        <div class="form-group">
+                            <h5>Positive Player</h5>
+                            <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="positivePlayer" id="posUserSelect" value="user" checked="true">
+                            <label class="form-check-label" for="inlineRadio1">User</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="positivePlayer" id="posCompSelect" value="computer">
+                            <label class="form-check-label" for="inlineRadio2">Computer</label>
+                            </div>
+                            <div id="positiveDepthSelection" class="depthSelect" hidden=true>
+                            <label for="posDepth" class="depthLabel">Search depth</label>
+                            <input type="number" id="positiveDepth" name="positiveDepth" min="1" value="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <h5>Negative Player</h5>
+                            <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="negativePlayer" id="negUserSelect" value="user" checked="true">
+                            <label class="form-check-label" for="inlineRadio1">User</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="negativePlayer" id="negCompSelect" value="computer">
+                            <label class="form-check-label" for="inlineRadio2">Computer</label>
+                            </div>
+                            <div id="negativeDepthSelection" class="depthSelect" hidden=true>
+                            <label for="negDepth" class="depthLabel">Search depth</label>
+                            <input type="number" id="negativeDepth" name="negativeDepth" min="1" value="1">
+                            </div>
+                        </div>
+                        </div>
+                            <button type="button" class="btn btn-primary neon-outline" id="startButton">Play</button>
+
+                    </div>
+            </div>
+            <div class="col-6">
+                <canvas id="gameBoard" width="600" height="600">
+                    Your browser does not support the canvas element
+                </canvas>
+            </div>
+            <div class="col-3">
+                <div class="neon-outline" id="tableWrapper">
+                    <table id="moveHistory">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="star" id="big"></div>
+    <div class="star" id="medium"></div>
+    <div class="star" id="small"></div>
+    <script src="js/negamaxWorker.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/graphics.js"></script>
+    <script src="js/nexus.js"></script>
+    <script src="js/thinker.js"></script>
+    <script src="js/engine.js"></script>
+    <script src="js/simulator.js"></script>
+    <script src="js/optimiser.js"></script>
+    <script src="js/pieces.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
