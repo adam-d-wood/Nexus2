@@ -300,8 +300,8 @@ class Agent extends Nexus {
             console.log(node.principleChild.move, node.principleChild.value)
             return node.principleChild    
         } else {
-            node = this.negamax2(node, depth, -10000, 10000, turn)
-            return node.principleChild
+            node = this.negamax(node, depth, -10000, 10000, turn)
+            return node
         }
 
     }
