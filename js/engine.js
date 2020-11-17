@@ -16,6 +16,26 @@ class Engine extends Nexus {
         this.gameHistory = []
         this.positionsReached = [this.board.field]
         this.initGameTable()
+        this.initPausePlay();
+    }
+
+    initPausePlay() {
+        var self = this
+        var pausePlayButton = $("#pausePlayButton");
+        console.log("jajajaj")
+        pausePlayButton.text("||")
+        pausePlayButton.off()
+        pausePlayButton.on("click", function() {
+            if(self.running) {
+                self.running = false
+                this.innerText = ">"
+            } else {
+                self.running = true
+                console.log("jajaj")
+                self.handleTurn()
+                this.innerText = "||"
+            }
+        })
     }
 
     initGameTable() {
@@ -135,33 +155,35 @@ class Engine extends Nexus {
     }
 
     handleTurn() {
-        this.pieceProgressionHistory = this.getNextProgressionHistory()
-        var controlMatrix = this.getControlMatrix(this.board.field)
-        console.log("legals", this.getLegalMoves(this.board.field, this.turn).length)
-        console.log(this.turn)
-        for (var i = 0; i < this.board.rows; i++) {
-            console.log(this.board.field[i], controlMatrix[i])
-        }
-        var activeAgent = this.turn == 1 ? this.posAgent : this.negAgent
-        if (this.gameEnded(this.board.field)) {
-            this.handleEnd()
-        } else {
-            if(this.getLegalMoves(this.board.field, this.turn).length == 0) {
-                console.log("pass")
-                this.handlePass()
-            } else if (activeAgent == "human") {
-                console.log("hooman")
-                var self = this
-                $("#gameBoard").one("mousedown", function() {
-                    self.processHumanMove()
-                })
-            } else {
-                var self = this
-                setTimeout(function() {
-                    self.processCompMove()
-                }, 10)
+        if (this.running) {
+            this.pieceProgressionHistory = this.getNextProgressionHistory()
+            var controlMatrix = this.getControlMatrix(this.board.field)
+            console.log("legals", this.getLegalMoves(this.board.field, this.turn).length)
+            console.log(this.turn)
+            for (var i = 0; i < this.board.rows; i++) {
+                console.log(this.board.field[i], controlMatrix[i])
             }
-        }
+            var activeAgent = this.turn == 1 ? this.posAgent : this.negAgent
+            if (this.gameEnded(this.board.field)) {
+                this.handleEnd()
+            } else {
+                if(this.getLegalMoves(this.board.field, this.turn).length == 0) {
+                    console.log("pass")
+                    this.handlePass()
+                } else if (activeAgent == "human") {
+                    console.log("hooman")
+                    var self = this
+                    $("#gameBoard").one("mousedown", function() {
+                        self.processHumanMove()
+                    })
+                } else {
+                    var self = this
+                    setTimeout(function() {
+                        self.processCompMove()
+                    }, 10)
+                }
+            }
+        }    
     }
 
     handleEnd() {
@@ -225,16 +247,18 @@ class Engine extends Nexus {
     }
 
     executeMove(move) {
-        if (this.isLegal(this.board.field, move, this.turn)) {
-            console.log("executing", move)
-            this.insertToken(move)
-            this.draw()
-            this.turn *= -1
-            this.gameHistory.push(move)
-            this.positionsReached.push(this.board.field)
-            this.updateGameTable()
+        if (this.running) {
+            if (this.isLegal(this.board.field, move, this.turn)) {
+                console.log("executing", move)
+                this.insertToken(move)
+                this.draw()
+                this.turn *= -1
+                this.gameHistory.push(move)
+                this.positionsReached.push(this.board.field)
+                this.updateGameTable()
+            }
+            this.handleTurn()    
         }
-        this.handleTurn()
     }
 
     getSquare(event) {
