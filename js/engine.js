@@ -3,6 +3,7 @@ class Engine extends Nexus {
         super(cols, rows)
         this.display = new Display(cols, rows)
         this.running = true
+        this.stepping = false
         // weights: [nexusDiff, mobility, control]
         this.posWeights = [31, 8, 14]
         this.negWeights = [31, 8, 14]
@@ -15,30 +16,73 @@ class Engine extends Nexus {
         this.initialisePlayerSelect()
         this.gameHistory = []
         this.positionsReached = [this.board.field]
+        this.currentPly = 0
         this.initGameTable()
         this.initPausePlay();
+        this.initBackButton();
+        this.initForwardButton();
+    }
+
+    pauseGame() {
+        this.running = false;
+        var pausePlayButton = $("#pausePlayButton");
+        pausePlayButton.text(">");
+    }
+
+    resumeGame() {
+        this.running = true;
+        var pausePlayButton = $("pausePlayButton");
+        pausePlayButton.text("||");
+        this.handleTurn();
+    }
+
+    initBackButton() {
+        var self = this
+        var backButton = $("#backButton");
+        backButton.text("<<");
+        backButton.off()
+        backButton.on("click", function() {
+            self.pauseGame();
+            if (self.currentPly > 0) {
+                self.currentPly -= 1;
+                self.board.field = self.positionsReached[self.currentPly];
+                self.draw();
+            }
+        })
+    }
+
+    initForwardButton() {
+        var self = this;
+        var forwardButton = $("#forwardButton");
+        forwardButton.text(">>");
+        forwardButton.off();
+        forwardButton.on("click", function() {
+            self.pauseGame();
+            if (self.currentPly < self.positionsReached.length-1) {
+                self.currentPly += 1;
+                self.board.field = self.positionsReached[self.currentPly];
+                self.draw();
+            }
+        })
     }
 
     initPausePlay() {
         var self = this
         var pausePlayButton = $("#pausePlayButton");
-        console.log("jajajaj")
         pausePlayButton.text("||")
         pausePlayButton.off()
         pausePlayButton.on("click", function() {
             if(self.running) {
-                self.running = false
-                this.innerText = ">"
+                self.pauseGame();
             } else {
-                self.running = true
-                console.log("jajaj")
-                self.handleTurn()
-                this.innerText = "||"
+                self.resumeGame();
             }
         })
     }
 
     initGameTable() {
+
+        // clears game table ready for new game
         var table = document.getElementById("moveHistory")
         var len = table.rows.length
         for (var i = 0; i < len; i++) {
@@ -47,38 +91,41 @@ class Engine extends Nexus {
     }
 
     humanForm(cell) {
+        if (cell == "--") return "--";
         var row = (this.board.rows - cell[0]).toString()
         var col = String.fromCharCode(cell[1] + 97)
         return col + row
     }
-
-    initGameTable() {
-        // clears game table ready for new game
-    
-        var table = document.getElementById("moveHistory");
-        var len = table.rows.length;
-        for (var i = 0; i < len; i++) {
-          table.deleteRow(0);
-        }
-      }    
 
     updateGameTable() {
         var table = document.getElementById("moveHistory")
         var self = this
         var humanHistory = this.gameHistory.map(function(x) {
             return self.humanForm(x)}
-        ).join("")
+        )
         console.log(humanHistory)
-        if (humanHistory.length % 4 == 0) {
-            var row = table.rows[table.rows.length-1]
-            var cell = row.cells[1]
-            cell.innerHTML = humanHistory.slice(-2)
-        } else {
-            var row = table.insertRow(-1)
-            var cell = row.insertCell(0)
-            cell.innerHTML = humanHistory.slice(-2)
-            row.insertCell(1)
+        for (var i=0; i < humanHistory.length; i++) {
+            var row = Math.floor(i/2)
+            var col = i%2
+            if (!(table.rows.length > row)) {
+                table.insertRow(row)
+                for (var k; k < 2; k++) {table.insertCell()}
+            }
+            if (!(table.rows[row].cells.length > col)) {
+                table.rows[row].insertCell(col);
+            }
+            table.rows[row].cells[col].innerText = humanHistory[i];
         }
+        // if (humanHistory.length % 4 == 0) {
+        //     var row = table.rows[table.rows.length-1]
+        //     var cell = row.cells[1]
+        //     cell.innerHTML = humanHistory.slice(-2)
+        // } else {
+        //     var row = table.insertRow(-1)
+        //     var cell = row.insertCell(0)
+        //     cell.innerHTML = humanHistory.slice(-2)
+        //     row.insertCell(1)
+        // }
     }
 
     getPosDepth() {
@@ -196,6 +243,8 @@ class Engine extends Nexus {
         this.turn *= -1
         this.gameHistory.push("--")
         this.positionsReached.push(this.board.field)
+        this,this.currentPly += 1
+        this.updateGameTable()
         this.handleTurn()
     }
 
@@ -255,6 +304,7 @@ class Engine extends Nexus {
                 this.turn *= -1
                 this.gameHistory.push(move)
                 this.positionsReached.push(this.board.field)
+                this.currentPly += 1
                 this.updateGameTable()
             }
             this.handleTurn()    

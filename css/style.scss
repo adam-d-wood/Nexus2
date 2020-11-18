@@ -122,6 +122,11 @@ body {
 #moveHistory {
     width: 100%;
     text-align: center;
+    table-layout: fixed;
+
+    td {
+        width: 50%;
+    }
 }
 
 // #moveHistory th, tr {
