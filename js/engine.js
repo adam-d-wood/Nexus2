@@ -27,11 +27,12 @@ class Engine extends Nexus {
         this.running = false;
         var pausePlayButton = $("#pausePlayButton");
         pausePlayButton.text(">");
+        $("#gameBoard").off();
     }
 
     resumeGame() {
         this.running = true;
-        var pausePlayButton = $("pausePlayButton");
+        var pausePlayButton = $("#pausePlayButton");
         pausePlayButton.text("||");
         this.handleTurn();
     }
@@ -45,6 +46,7 @@ class Engine extends Nexus {
             self.pauseGame();
             if (self.currentPly > 0) {
                 self.currentPly -= 1;
+                self.turn *= -1
                 self.board.field = self.positionsReached[self.currentPly];
                 self.draw();
             }
@@ -60,6 +62,7 @@ class Engine extends Nexus {
             self.pauseGame();
             if (self.currentPly < self.positionsReached.length-1) {
                 self.currentPly += 1;
+                self.turn *= 1;
                 self.board.field = self.positionsReached[self.currentPly];
                 self.draw();
             }
@@ -100,6 +103,11 @@ class Engine extends Nexus {
     updateGameTable() {
         var table = document.getElementById("moveHistory")
         var self = this
+        var len = table.rows.length
+        for (var i = 0; i < len; i++) {
+            table.deleteRow(0)
+        }
+        console.log(this.gameHistory)
         var humanHistory = this.gameHistory.map(function(x) {
             return self.humanForm(x)}
         )
@@ -302,10 +310,17 @@ class Engine extends Nexus {
                 this.insertToken(move)
                 this.draw()
                 this.turn *= -1
-                this.gameHistory.push(move)
-                this.positionsReached.push(this.board.field)
+                if (this.currentPly == this.gameHistory.length) {
+                    this.gameHistory.push(move)
+                    this.positionsReached.push(this.board.field)    
+                } else {
+                    this.gameHistory = this.gameHistory.slice(0, this.currentPly);
+                    this.gameHistory.push(move);
+                    this.positionsReached = this.positionsReached.slice(0, this.currentPly);
+                    this.positionsReached.push(this.board.field);
+                }
                 this.currentPly += 1
-                this.updateGameTable()
+                this.updateGameTable()  
             }
             this.handleTurn()    
         }
