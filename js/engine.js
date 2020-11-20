@@ -47,6 +47,7 @@ class Engine extends Nexus {
             if (self.currentPly > 0) {
                 self.currentPly -= 1;
                 self.turn *= -1
+                self.highlightCurrentMove();
                 self.board.field = self.positionsReached[self.currentPly];
                 self.draw();
             }
@@ -63,6 +64,7 @@ class Engine extends Nexus {
             if (self.currentPly < self.positionsReached.length-1) {
                 self.currentPly += 1;
                 self.turn *= 1;
+                self.highlightCurrentMove();
                 self.board.field = self.positionsReached[self.currentPly];
                 self.draw();
             }
@@ -124,16 +126,20 @@ class Engine extends Nexus {
             }
             table.rows[row].cells[col].innerText = humanHistory[i];
         }
-        // if (humanHistory.length % 4 == 0) {
-        //     var row = table.rows[table.rows.length-1]
-        //     var cell = row.cells[1]
-        //     cell.innerHTML = humanHistory.slice(-2)
-        // } else {
-        //     var row = table.insertRow(-1)
-        //     var cell = row.insertCell(0)
-        //     cell.innerHTML = humanHistory.slice(-2)
-        //     row.insertCell(1)
-        // }
+        this.highlightCurrentMove();
+    }
+
+    highlightCurrentMove() {
+        var table = document.getElementById("moveHistory");
+        for (var row of table.rows) {
+            for (var cell of row.cells) {
+                cell.style.color = "gray";
+            }
+        }
+        var i = Math.floor((this.currentPly-1) / 2);
+        var j = (this.currentPly-1) % 2;
+        var currentMoveCell = table.rows[i].cells[j];
+        currentMoveCell.style.color = "white";
     }
 
     getPosDepth() {
