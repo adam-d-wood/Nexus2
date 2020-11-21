@@ -317,8 +317,9 @@ class Nexus {
     }
 
     isLegal(field, move, turn) {
-        var control = this.getCellControl(field, move)                                                                                                                                                                                                          
-        var legal = control * turn > 0
+        var control = this.getCellControl(field, move)
+        var empty = this.board.field[move[0]][move[1]] == 0;                                                                                                                                                                                                         
+        var legal = control * turn > 0 && empty;
         return legal
     }
 

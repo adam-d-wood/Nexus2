@@ -200,10 +200,8 @@ class Engine extends Nexus {
                 var id = charge + "DepthSelection"
                 var depthSelect = document.getElementById(id)
                 if (this.value == "computer") {
-                    // console.log("showing ", id)
                     depthSelect.hidden = false;
                 } else {
-                    // console.log("hiding", id)
                     depthSelect.hidden = true
                 }
                 if (charge == "positive") {
@@ -316,8 +314,8 @@ class Engine extends Nexus {
     }
 
     executeMove(move) {
-        console.log("yh")
         if (this.running) {
+            console.log("legals,", this.getLegalMoves(this.board.field, this.turn))
             if (this.isLegal(this.board.field, move, this.turn)) {
                 console.log("executing", move)
                 this.insertToken(move)
@@ -334,7 +332,6 @@ class Engine extends Nexus {
                 }
                 this.currentPly += 1
                 this.updateGameTable()  
-                console.log(this.positionsReached);
             }
             this.handleTurn()    
         }
