@@ -50,6 +50,10 @@ class Engine extends Nexus {
                 self.highlightCurrentMove();
                 self.board.field = self.positionsReached[self.currentPly];
                 self.draw();
+                if (self.gameHistory[self.currentPly] == "--") {
+                    console.log("and again")
+                    this.click();
+                }
             }
         })
     }
@@ -136,10 +140,12 @@ class Engine extends Nexus {
                 cell.style.color = "gray";
             }
         }
-        var i = Math.floor((this.currentPly-1) / 2);
-        var j = (this.currentPly-1) % 2;
-        var currentMoveCell = table.rows[i].cells[j];
-        currentMoveCell.style.color = "white";
+        if (this.currentPly > 0) {
+            var i = Math.floor((this.currentPly-1) / 2);
+            var j = (this.currentPly-1) % 2;
+            var currentMoveCell = table.rows[i].cells[j];
+            currentMoveCell.style.color = "white";
+        }
     }
 
     getPosDepth() {
@@ -310,6 +316,7 @@ class Engine extends Nexus {
     }
 
     executeMove(move) {
+        console.log("yh")
         if (this.running) {
             if (this.isLegal(this.board.field, move, this.turn)) {
                 console.log("executing", move)
@@ -322,11 +329,12 @@ class Engine extends Nexus {
                 } else {
                     this.gameHistory = this.gameHistory.slice(0, this.currentPly);
                     this.gameHistory.push(move);
-                    this.positionsReached = this.positionsReached.slice(0, this.currentPly);
+                    this.positionsReached = this.positionsReached.slice(0, this.currentPly+1);
                     this.positionsReached.push(this.board.field);
                 }
                 this.currentPly += 1
                 this.updateGameTable()  
+                console.log(this.positionsReached);
             }
             this.handleTurn()    
         }
