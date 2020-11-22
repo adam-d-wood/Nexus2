@@ -24,17 +24,22 @@ class Engine extends Nexus {
     }
 
     pauseGame() {
+        var self = this;
         this.running = false;
         var pausePlayButton = $("#pausePlayButton");
         pausePlayButton.text(">");
-        $("#gameBoard").off();
-    }
+        // $("#gameBoard").off();
+        // $("#gameBoard").one("mousedown", function() {
+        //     self.processHumanMove();
+        // });
+}
 
     resumeGame() {
+        // $("gameBoard").off();
         this.running = true;
         var pausePlayButton = $("#pausePlayButton");
         pausePlayButton.text("||");
-        this.handleTurn();
+        this.handleTurn();j
     }
 
     initBackButton() {
