@@ -24,24 +24,6 @@ class Display {
         this.fillMargin()
     }
 
-    // drawGrid() {
-    //     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    //     this.ctx.strokeStyle = "#A2A3BB";
-    //     for (var i = 1; i < this.rows; ++i) {
-    //       this.ctx.beginPath();
-    //       this.ctx.moveTo(this.cellSide * i, 0);
-    //       this.ctx.lineTo(this.cellSide * i, this.canvas.height);
-    //       this.ctx.stroke();
-    //       this.ctx.closePath();
-    
-    //       this.ctx.beginPath();
-    //       this.ctx.moveTo(0, this.cellSide * i);
-    //       this.ctx.lineTo(this.canvas.width, this.cellSide * i);
-    //       this.ctx.stroke();
-    //       this.ctx.closePath();
-    //     }    
-    // }
-
     drawGrid() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
         this.ctx.strokeStyle = "#A2A3BB";
@@ -75,7 +57,6 @@ class Display {
         var increments = endColour.map(function(x, i) {
             return (x - colour[i]) * interval/duration
         })
-        // console.log("increments", increments)
         var counter = 0
         var id = setInterval(frame, interval)
         var self = this
@@ -87,7 +68,6 @@ class Display {
                     return x + increments[i]
                 })
                 counter ++
-                // console.log("setting colour to", self.hexColour(colour))
                 self.canvas.style.backgroundColor = self.hexColour(colour)
             }
         }

@@ -13,12 +13,6 @@ class Board {
                 field[i].push(0)
             }
         }
-        // field[0][this.cols - 2] = -9
-        // field[this.rows - 1][1] = 9
-
-        // field[1][this.cols - 3] = -9
-        // field[this.rows - 2][2] = 9
-
         if (this.rows % 2 == 0 && this.cols % 2 == 0) {
             var rowMid = this.rows / 2;
             var colMid = this.cols / 2;
@@ -28,10 +22,6 @@ class Board {
             field[2][3] = -9
             field[3][2] = 9    
         }
-
-
-        // field[1][this.cols-2] = -9
-        // field[this.rows - 2][1] = 9
 
         return field
     }
