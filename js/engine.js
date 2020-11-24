@@ -1,7 +1,7 @@
 class Engine extends Nexus {
     constructor(cols, rows) {
         super(cols, rows)
-        this.display = new Display(cols, rows)
+        this.display = new Display(cols, rows, "gameBoard")
         this.running = true
         this.stepping = false
         // weights: [nexusDiff, mobility, control]

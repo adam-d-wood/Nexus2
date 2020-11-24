@@ -1,6 +1,6 @@
 class Display {
-    constructor(cols, rows) {
-        this.canvas = document.getElementById("gameBoard");
+    constructor(cols, rows, canvasId) {
+        this.canvas = document.getElementById(canvasId);
         this.canvas.style.backgroundColor = "#00000000"
         this.ctx = this.canvas.getContext("2d");
         this.cellSide = this.getCellSideLength(cols, rows)
