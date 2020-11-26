@@ -21,6 +21,19 @@ class Engine extends Nexus {
         this.initPausePlay();
         this.initBackButton();
         this.initForwardButton();
+        this.initKeyControls();
+    }
+
+    initKeyControls() {
+        var self = this;
+        // $(window).off();
+        $(window).on("keydown", function() {
+            console.log(event.which);
+            if (event.keyCode == 18) {
+                console.log("ya")
+                self.togglePlay();
+            }
+        })
     }
 
     pauseGame() {
@@ -39,7 +52,7 @@ class Engine extends Nexus {
         this.running = true;
         var pausePlayButton = $("#pausePlayButton");
         pausePlayButton.text("||");
-        this.handleTurn();j
+        this.handleTurn();
     }
 
     initBackButton() {
@@ -80,18 +93,29 @@ class Engine extends Nexus {
         })
     }
 
+    togglePlay() {
+        console.log("yeet")
+        if(this.running) {
+            this.pauseGame();
+        } else {
+            this.resumeGame();
+        }
+    }
+
     initPausePlay() {
         var self = this
         var pausePlayButton = $("#pausePlayButton");
         pausePlayButton.text("||")
         pausePlayButton.off()
-        pausePlayButton.on("click", function() {
-            if(self.running) {
-                self.pauseGame();
-            } else {
-                self.resumeGame();
-            }
-        })
+        pausePlayButton.on("click", function() {self.togglePlay()})
+        $(window).on("keypress", function() {self.togglePlay()})
+        // pausePlayButton.on("click", function() {
+        //     if(self.running) {
+        //         self.pauseGame();
+        //     } else {
+        //         self.resumeGame();
+        //     }
+        // })
     }
 
     initGameTable() {
