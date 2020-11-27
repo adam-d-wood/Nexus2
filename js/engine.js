@@ -21,15 +21,15 @@ class Engine extends Nexus {
         this.initPausePlay();
         this.initBackButton();
         this.initForwardButton();
-        this.initKeyControls();
+        // this.initKeyControls();
     }
 
     initKeyControls() {
         var self = this;
-        // $(window).off();
-        $(window).on("keydown", function() {
+        $("#gameBoard").off();
+        $("#gameBoard").on("keypress", function() {
             console.log(event.which);
-            if (event.keyCode == 18) {
+            if (event.keyCode == 32) {
                 console.log("ya")
                 self.togglePlay();
             }
@@ -108,7 +108,7 @@ class Engine extends Nexus {
         pausePlayButton.text("||")
         pausePlayButton.off()
         pausePlayButton.on("click", function() {self.togglePlay()})
-        $(window).on("keypress", function() {self.togglePlay()})
+        // $(window).on("keypress", function() {self.togglePlay()})
         // pausePlayButton.on("click", function() {
         //     if(self.running) {
         //         self.pauseGame();
