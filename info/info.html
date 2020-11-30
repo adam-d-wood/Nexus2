@@ -30,7 +30,7 @@
             Normally, an explanation of the rules of a game would begin with the win condition: the aim of the game. However, if we started with the statement, "The aim of Nexus is to control the opponent's Nexus", you would rightly complain that we haven't yet introduced the notion of control. Therefore, let us start with a description of the game's core mechanic: Control.
         </p>
         <h1>Control</h1>
-        <p>From an impartial perspective, each square has a control value associated with it. If a square has a positive control value, then red can summon a piece on that square and, likewise, if a square has a negative control value, then blue can summon a piece. Finally, if a player has a control of zero, then neither player can summon a piece on it.</p>
+        <p>From an impartial perspective, each square has a control value associated with it. If a square has a positive control value, then red can summon a piece on that square and, likewise, if a square has a negative control value, then blue can summon a piece. Finally, if a player has a control of zero, then neither player can summon a piece on it. Each piece "exerts" control in a pattern, similarly to how in chess a knight would be attacking/defending a different set of squares to a bishop if it were on the same square. The control value of a square, then, is simply the number of times it is "controlled" by a red piece minus the number of times it is "controlled" by a blue piece.</p>
 
         <script src="../js/board.js"></script>
         <script src="../js/graphics.js"></script>
