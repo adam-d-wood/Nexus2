@@ -6,7 +6,8 @@
             href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
             integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
             crossorigin="anonymous">
-        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="../css/style.css">
+        <link rel="stylesheet" href="info.css">
         <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico?" />
         <script
             src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
@@ -17,20 +18,42 @@
     
     </head>
     <body>
-        <h1>Pre-Preamble</h1>
-        <p>
-            Before, we get to the interesting part, here's a very high level overview of Nexus.
-            Nexus is played on a 6x6 board and each player, provided they have a legal move, takes turns placing or "summoning" a piece on a particular sqaure. The two players are called Red and Blue and Red is first to play. Initially, each player has one piece, called the Nexus, on the board, creating the following initial setup.
-        </p>
-        <canvas class="nexusBoard" id="setupDemo" height="500" width="500">
-            Your browser does not support the canvas element
-        </canvas>
-        <h1>Preamble</h1>
-        <p>
-            Normally, an explanation of the rules of a game would begin with the win condition: the aim of the game. However, if we started with the statement, "The aim of Nexus is to control the opponent's Nexus", you would rightly complain that we haven't yet introduced the notion of control. Therefore, let us start with a description of the game's core mechanic: Control.
-        </p>
-        <h1>Control</h1>
-        <p>From an impartial perspective, each square has a control value associated with it. If a square has a positive control value, then red can summon a piece on that square and, likewise, if a square has a negative control value, then blue can summon a piece. Finally, if a player has a control of zero, then neither player can summon a piece on it. Each piece "exerts" control in a pattern, similarly to how in chess a knight would be attacking/defending a different set of squares to a bishop if it were on the same square. The control value of a square, then, is simply the number of times it is "controlled" by a red piece minus the number of times it is "controlled" by a blue piece.</p>
+        <img src="../images/crystal_BLUE_8bit.png" id="crystalBlue" class="sprite">
+        <img src="../images/crystal_RED_8bit.png" id="crystalRed" class="sprite">
+        <img src="../images/druid_BLUE_8bit2.png" id="druidBlue" class="sprite">
+        <img src="../images/druid_RED_8bit2.png" id="druidRed" class="sprite">
+        <img src="../images/ram_BLUE_8bit.png" id="ramBlue" class="sprite">
+        <img src="../images/ram_RED_8bit.png" id="ramRed" class="sprite">
+        <img src="../images/nexus_BLUE_8bit2.png" id="nexusBlue" class="sprite">
+        <img src="../images/nexus_RED_8bit2.png" id="nexusRed" class="sprite">
+        <img src="../images/nymph_RED_8bit.png" id="nymphRed" class="sprite">
+        <img src="../images/nymph_BLUE_8bit.png" id="nymphBlue" class="sprite">
+        <img src="../images/dryad_RED_8bit.png" id="dryadRed" class="sprite">
+        <img src="../images/dryad_BLUE_8bit.png" id="dryadBlue" class="sprite">
+    
+        <div class="container">
+            <h2>Pre-Preamble</h2>
+            <br>
+            <p>
+                Before, we get to the interesting part, here's a very high level overview of Nexus.
+                Nexus is played on a 6x6 board and each player, provided they have a legal move, takes turns placing or "summoning" a piece on a particular sqaure. The two players are called Red and Blue and Red is first to play. Initially, each player has one piece, called the Nexus, on the board, creating the following initial setup.
+            </p>
+            <br>
+            <canvas class="nexusBoard" id="setupDemo" height="500" width="500">
+                Your browser does not support the canvas element
+            </canvas>
+            <br>
+            <h2>Preamble</h2>
+            <br>
+            <p>
+                Normally, an explanation of the rules of a game would begin with the win condition: the aim of the game. However, if we started with the statement, "The aim of Nexus is to control the opponent's Nexus", you would rightly complain that we haven't yet introduced the notion of control. Therefore, let us start with a description of the game's core mechanic: Control.
+            </p>
+            <br>
+            <h2>Control</h2>
+            <br>
+            <p>From an impartial perspective, each square has a control value associated with it. If a square has a positive control value, then red can summon a piece on that square and, likewise, if a square has a negative control value, then blue can summon a piece. Finally, if a player has a control of zero, then neither player can summon a piece on it. Each piece "exerts" control in a pattern, similarly to how in chess a knight would be attacking/defending a different set of squares to a bishop if it were on the same square. The control value of a square, then, is simply the number of times it is "controlled" by a red piece minus the number of times it is "controlled" by a blue piece.</p>
+    
+        </div>
 
         <script src="../js/board.js"></script>
         <script src="../js/graphics.js"></script>
