@@ -3,3 +3,11 @@ body {
     overflow-y: auto;
     height: auto;
 }
+
+h2 {
+    font-family: "Audiowide", cursive;
+}
+
+p {
+    font-family: "Ubuntu Mono", monospace;
+}

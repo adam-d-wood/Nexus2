@@ -81,7 +81,7 @@ class Display {
         // labels the top and left side of the board
         // with the coordinate system
         
-        this.ctx.font = "14px Lucida Console";
+        this.ctx.font = "14px Courier New";
         this.ctx.fillStyle = "#ffffff";
         for (let i = 0; i < this.cols + 1; i++) {
           this.ctx.fillText(
