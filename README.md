@@ -3,4 +3,6 @@ Neuxs is a two-player, abstract strategy game. To use some more fancy words, it 
 
 The project is still in its infancy but you can play against the program, or get it to play itself, in a 'playground' environment at [nexus.adamwood.co.uk](https://nexus.adamwood.co.uk).
 
-An info page detailing the rules of the game is currently in production. 
+An info page detailing the rules of the game is currently in production.
+
+The long term plan is to add online functionality.
