@@ -5,4 +5,4 @@ The project is still in its infancy but you can play against the program, or get
 
 An info page detailing the rules of the game is currently in production.
 
-The long term plan is to add online functionality
+The long term plan is to add online functionality.
